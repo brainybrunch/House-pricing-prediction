@@ -1,1 +1,154 @@
 
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 24 22:25:38 2019
+
+@author: schtiven
+"""
+
+# data analysis and wrangling
+import pandas as pd
+import numpy as np
+import random as rnd
+
+# visualization
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+
+path_train = 'D:/Anaconda/Datasets_Kaggle/House_pricing_prediction/train.csv'
+path_test = 'D:/Anaconda/Datasets_Kaggle/House_pricing_prediction/test.csv'
+
+data_train = pd.read_csv(path_train)
+data_test = pd.read_csv(path_test)
+
+#list of 2 datasets
+data_combined = [data_train,data_test]
+
+#overall data exploration
+data_train.head()
+data_train.info()
+                 
+overall_mean = data_train.SalePrice.mean()  
+overall_mean                                                                                                                                                                   
+#Look at possible values of some variables
+
+#Numerical
+sns.pairplot(data_train[['1stFlrSF', 'SalePrice']]) #good
+sns.pairplot(data_train[['2ndFlrSF', 'SalePrice']]) #good
+sns.pairplot(data_train[['3SsnPorch', 'SalePrice']]) #medium
+sns.pairplot(data_train[['BedroomAbvGr', 'SalePrice']]) #poor
+sns.pairplot(data_train[['BsmtFinSF1', 'SalePrice']]) #good
+sns.pairplot(data_train[['BsmtFinSF2', 'SalePrice']]) #medium
+sns.pairplot(data_train[['BsmtFullBath', 'SalePrice']]) #split 0 and >1
+sns.pairplot(data_train[['BsmtHalfBath', 'SalePrice']]) #poor
+sns.pairplot(data_train[['BsmtUnfSF', 'SalePrice']]) #medium
+sns.pairplot(data_train[['EnclosedPorch', 'SalePrice']]) #poor
+sns.pairplot(data_train[['Fireplaces', 'SalePrice']]) #good
+sns.pairplot(data_train[['FullBath', 'SalePrice']]) #good
+sns.pairplot(data_train[['GarageArea', 'SalePrice']]) #good
+sns.pairplot(data_train[['GarageCars', 'SalePrice']]) #good
+sns.pairplot(data_train[['GrLivArea', 'SalePrice']]) #good
+sns.pairplot(data_train[['HalfBath', 'SalePrice']]) #medium - between 0 and >1
+sns.pairplot(data_train[['KitchenAbvGr', 'SalePrice']]) #poor
+sns.pairplot(data_train[['LotArea', 'SalePrice']]) #poor
+sns.pairplot(data_train[['LowQualFinSF', 'SalePrice']]) #poor
+sns.pairplot(data_train[['MiscVal', 'SalePrice']]) #poor
+sns.pairplot(data_train[['MoSold', 'SalePrice']]) #worth exploring with year
+sns.pairplot(data_train[['MSSubClass', 'SalePrice']]) #poor
+sns.pairplot(data_train[['OpenPorchSF', 'SalePrice']]) #poor
+sns.pairplot(data_train[['OverallCond', 'SalePrice']]) #good
+sns.pairplot(data_train[['OverallQual', 'SalePrice']]) #good
+sns.pairplot(data_train[['PoolArea', 'SalePrice']]) #poor
+sns.pairplot(data_train[['ScreenPorch', 'SalePrice']]) #medium, but low credibility
+sns.pairplot(data_train[['TotalBsmtSF', 'SalePrice']]) #good
+sns.pairplot(data_train[['TotRmsAbvGrd', 'SalePrice']]) #good
+sns.pairplot(data_train[['WoodDeckSF', 'SalePrice']]) #poor
+sns.pairplot(data_train[['YearBuilt', 'SalePrice']]) #medium
+sns.pairplot(data_train[['YearRemodAdd', 'SalePrice']]) #medium
+sns.pairplot(data_train[['YrSold', 'SalePrice']]) #poor
+
+
+#non-numerical
+
+#step 1 : filter out those who don't have much varieties in values=
+data_train.Alley.value_counts() #Most are missing
+data_train.BldgType.value_counts() #Most are 1fam
+data_train.BsmtCond.value_counts() #most are TA
+data_train.BsmtExposure.value_counts() # even
+data_train.BsmtFinType1.value_counts() # even
+data_train.BsmtFinType2.value_counts() #most are unF
+data_train.BsmtQual.value_counts() #even
+data_train.CentralAir.value_counts() #most have Y
+data_train.Condition1.value_counts() #most  Norm
+data_train.Condition2.value_counts() #most are Norm
+data_train.Electrical.value_counts()  #most are Norm
+data_train.ExterCond.value_counts() #most are TA
+data_train.Exterior1st.value_counts() #even
+data_train.Exterior2nd.value_counts() #even
+data_train.ExterQual.value_counts() #even
+data_train.Fence.value_counts() #lots of missing
+data_train.FireplaceQu.value_counts() #ok
+data_train.Foundation.value_counts() #ok
+data_train.Functional.value_counts() #most are Typ
+data_train.GarageCond.value_counts() #most are TA
+data_train.GarageFinish.value_counts() #ok
+data_train.GarageQual.value_counts()#most are Typ
+data_train.GarageType.value_counts() #ok
+data_train.Heating.value_counts() #most are gas
+data_train.HeatingQC.value_counts() #ok
+data_train.HouseStyle.value_counts() #ok
+data_train.KitchenQual.value_counts()#ok
+data_train.LandContour.value_counts() #most are lvl
+data_train.LandSlope.value_counts() #most are lvl
+data_train.LotConfig.value_counts() #ok
+data_train.GarageYrBlt.value_counts()#ok - need to group
+data_train.LotFrontage.value_counts() #ok - need to group
+data_train.LotShape.value_counts()#ok 
+data_train.MasVnrArea.value_counts() #ok - need to group
+data_train.MasVnrType.value_counts() #ok
+data_train.MiscFeature.value_counts() #lots of missing
+data_train.MSZoning.value_counts() #ok
+data_train.Neighborhood.value_counts()  #ok
+data_train.PavedDrive.value_counts() #most are Y
+data_train.PoolQC.value_counts() #most are missing
+data_train.RoofMatl.value_counts() #most are Compshg
+data_train.RoofStyle.value_counts() #ok
+data_train.SaleCondition.value_counts() #ok
+data_train.SaleType.value_counts() #most are WD
+data_train.Street.value_counts() #Most are pavel
+data_train.Utilities.value_counts() #Most are AllPub
+
+
+#step 2 : filter out those who don't have much lift
+
+def mean_calc(var):
+    moyenne=data_train.groupby(var,as_index=False).SalePrice.mean().sort_values(by='SalePrice',ascending = False)
+    
+    return moyenne
+
+mean_calc('BsmtExposure') #1.55
+mean_calc('BsmtFinType1') #1.60
+mean_calc('BsmtQual') #2.9
+mean_calc('Exterior1st') #3.69
+mean_calc('Exterior2nd') #3.03
+mean_calc('ExterQual') #4.12
+mean_calc('FireplaceQu') #2.61
+mean_calc('Foundation') #2.1
+mean_calc('GarageFinish') #1.69
+mean_calc('GarageType')#2.33
+mean_calc('HeatingQC') #2.47
+mean_calc('HouseStyle') # 2
+mean_calc('KitchenQual') #3.2
+mean_calc('LotConfig') #1.26
+mean_calc('LotFrontage') # 
+mean_calc('LotShape') #1.45
+mean_calc('MasVnrArea') #
+mean_calc('MasVnrType') #1.81
+mean_calc('MSZoning') #2.89
+mean_calc('Neighborhood') #3.41
+mean_calc('RoofStyle') #1.52
+mean_calc('SaleCondition') #2.61
+
+#Take variables with a lift >2
